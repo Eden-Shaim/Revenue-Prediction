@@ -21,7 +21,7 @@ test_raw = pd.read_csv(folder_path_data + 'test.tsv',delimiter='\t')
 ```
 
 ## Exploratory Data Analysis
-
+![svg](README_files/raw_train_head.jpeg)
 
 ### Check dataset unique values
 ``` python
