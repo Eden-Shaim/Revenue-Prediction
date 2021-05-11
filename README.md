@@ -21,8 +21,17 @@ test_raw = pd.read_csv(folder_path_data + 'test.tsv',delimiter='\t')
 ```
 
 ## Exploratory Data Analysis
-![svg](snippets_for_read_me/raw_train_head.jpeg)
- 
+``` python
+train_raw.head()
+```
+
+![jpeg](snippets_for_read_me/raw_train_head.jpeg)
+
+``` python
+test_raw.head()
+```
+
+ ![jpeg](snippets_for_read_me/raw_test_head.jpeg)
  
 ### Check dataset unique values
 ``` python
@@ -31,11 +40,15 @@ counts_train = train_raw.nunique()
 counts_train
 ```
 
+ ![jpeg](snippets_for_read_me/raw_counts_train.jpeg)
+
 ```python
 # Test
 counts_test = test_raw.nunique()
 counts_test
 ```
+
+![jpeg](snippets_for_read_me/raw_counts_test.jpeg)
 
 - As we can see the train dataset & test dataset are in the same structure and both contain nested columns 
 - we will unpack the nested structures later on. Those columns are all Strings.
@@ -47,12 +60,13 @@ counts_test
 train_raw.describe().apply(lambda s: s.apply(lambda x: format(x, 'g')))
 ```
 
-
+![jpeg](snippets_for_read_me/train_describe.jpeg)
 
 ```python
 test_raw.describe().apply(lambda s: s.apply(lambda x: format(x, 'g')))
 ```
 
+![jpeg](snippets_for_read_me/print_of_suspected_missing_vals.jpeg)
 
 - We can see that both train & test contain uncertain data - rows with runtime = 0 , budget = 0 
 - We will treat those values as missing data and they will be imputed later on.
@@ -63,6 +77,8 @@ print(f"Train dataset: Amount of movies with 0 runtime: {len(train_raw[train_raw
 print(f"Test dataset : Amount of movies with 0 budget: {len(test_raw[test_raw['budget'] == 0])}")
 print(f"Test dataset : Amount of movies with 0 budget: {len(test_raw[test_raw['runtime'] == 0])}")
 ```
+
+![jpeg](snippets_for_read_me/train_describe.jpeg)
 
 ### Features distribution & comparative analysis between features
 ``` python
