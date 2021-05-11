@@ -87,7 +87,7 @@ plt.show()
 ```
 
 
-### Missing data
+## Missing data
 ```python 
 # The raw data contains Empty values as ['[]', '{}', '']. we will replace those values with None just for an easier view 
 train_na = train_raw.replace(to_replace =['[]', '{}', ''], value = np.nan)
@@ -103,3 +103,27 @@ train_na.isnull().sum().sort_values(ascending=False)
 print ("Test missing values :")
 test_na.isnull().sum().sort_values(ascending=False)
 ```
+- The feature <b>'belongs_to_collection'</b> contains many None's. That makes sense because most the movies are not part of a collection 
+- The features <b>'homepage'</b> & <b>'tagline'</b> also has many None values.
+That makes them preaty unrelevant for out task because if imputation is required (not necessarily) we won't be able to apply it without additional data. Also the percentage of None values is ~50% & ~20% accordingly (high numbers)
+- The features <b>'backdrop_path'</b> & <b>'poster_path'</b> refer to images which are irrelevant for our task 
+
+## Feature Engineering
+
+### Unpack nested columns
+First, we should unpack all the nested attrubutes in the columns.
+
+We used <b>eval</b> to convert the string representation of an attrubutes to an object.
+Following, we extracted the relevant information (in our opinion) from each column as follows:
+
+- `belongs_to_collection_ids` : If a movie belongs to a collection - we keep the collection id, else None.
+- `genres` : The genre `name` attributes
+- `production_comapnies_names` & `production_comapnies_origin_country` : List of production company names attribute & production companies origin country.
+- `production_countries` : List of countries (`iso_3166`) where the movie was filmed.
+- `release_month`, `release_year` : The month & year the film was released on.
+- `spoken_languages_len` : Number of spoken languages in the movie (`iso_639` attribute).
+- `Keywords_names` : List of name attribute for each Keyword.
+- `cast_len` : Number of members in the cast.
+- `crew` : We created a column for each department in the dataset(there are 12).
+In each column you can find the numbers of members in the crew from the fitting department.
+- `crew_directors_names` - A column that contains a tuple of each of the director's names
