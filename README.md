@@ -162,10 +162,13 @@ flatten_test_df = flatten_features(test_raw)
 ```python
 flatten_train_df.head()
 ```
+![jpeg](snippets_for_read_me/train_flatten.jpeg)
 
 ``` python
 flatten_test_df.head()
 ```
+
+![jpeg](snippets_for_read_me/test_flatten.jpeg)
 
 ### Our features candidates (before feature selection):
 
