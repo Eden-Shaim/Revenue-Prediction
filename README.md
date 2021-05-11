@@ -85,7 +85,7 @@ print(f"Test dataset : Amount of movies with 0 budget: {len(test_raw[test_raw['r
 sns.pairplot(train_raw.select_dtypes('number').drop(columns='id'), kind="reg", diag_kind="kde")
 plt.show()
 ```
-![jpeg](snippets_for_read_me/pairplot_for_correlation.jpeg.jpeg)
+![jpeg](snippets_for_read_me/pairplot_for_correlation.jpeg)
 
 * In the main diagonal we can see each of the numerical column distribution
 
