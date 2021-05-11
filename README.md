@@ -21,9 +21,7 @@ test_raw = pd.read_csv(folder_path_data + 'test.tsv',delimiter='\t')
 ```
 
 ## Exploratory Data Analysis
-<p align='center'>
-   <img src="https://github.com/Eden-Shaim/Revenue-Prediction/blob/main/snippets_for_read_me/raw_train_head.jpeg";></img>
- </p>
+![svg](snippets_for_read_me/raw_train_head.jpeg)
  
  
 ### Check dataset unique values
