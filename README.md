@@ -36,10 +36,7 @@ counts_test = test_raw.nunique()
 counts_test
 ```
 
-$\bullet$ As we can see the train dataset & test dataset are in the same structure and both contain nested columns 
-
-$\bullet$ we will unpack the nested structures later on. Those columns are all Strings.
-
-$\bullet$ There are no duplicate rows in both datasets
-
-$\bullet$ All movies are 'Realesed' and therfore <b>Status</b> column, containing only 1 value, has no impact and won't be in use
+- As we can see the train dataset & test dataset are in the same structure and both contain nested columns 
+- we will unpack the nested structures later on. Those columns are all Strings.
+- There are no duplicate rows in both datasets
+- All movies are 'Realesed' and therfore <b>Status</b> column, containing only 1 value, has no impact and won't be in use
