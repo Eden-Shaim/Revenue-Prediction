@@ -127,3 +127,46 @@ Following, we extracted the relevant information (in our opinion) from each colu
 - `crew` : We created a column for each department in the dataset(there are 12).
 In each column you can find the numbers of members in the crew from the fitting department.
 - `crew_directors_names` - A column that contains a tuple of each of the director's names
+
+
+``` python 
+flatten_train_df = flatten_features(train_raw)
+flatten_test_df = flatten_features(test_raw)
+```
+
+```python
+flatten_train_df.head()
+```
+
+``` python
+flatten_test_df.head()
+```
+
+### Our features candidates (before feature selection):
+
+- `collection_size` : The amount of movies in the collection (1 if the movie is not part of a collection) - will derive from `belongs_to_collection` column.
+- `budget` : The budget column in a normelize form (log/ min-max normalization)
+- `[gener name]` : Dummy column for each gener (19 geners in the universe)
+- `[language]` : Dummy column for the 5 most frequent movie's original languages in our universe
+- `overview_word_count` : Amount of words in overview
+- `popularity` : The popularity column in a normelize form (min-max normalization)
+- `[production company id]` : Dummy column for the 5 most frequent movie's production companies
+- `num_films_of_biggest_company` : The numbers of films that the biggest production company (The one with the hightes number of films) that participates in this movie has produced (From the currect universe)
+- `num_films_of_biggest_country` : The numbers of films that the biggest production country (The one with the hightes number of films) that participates in this movie has produced (From the currect universe)
+- `released_year` : The year that the movie was realed on
+- `released_month` : The month that the movie was realed on
+- `runtime` : The moview lenth in minutes, normelized (min-max normalization)
+- `spoken_lang_len` : The amount of spoken languages in a film.
+- `is_english_spoken` : Binary column, 1 if English is one of tthe spoken langueges and 0 otherwize.
+- `tagline_char_count` : The length (characters) of a tagline.
+- `title_char_count` : The length (characters) of a title.
+- `sum_votes` : The sum of votes for the movie(calculated by vote_avg * vote_count), in a normelized form (min-max normalization).
+- `[Keywords]` : There are ~10,000 unique keywords in train data, so we will create dummy column for each of the top 20 most-frequent keywords in the universe.
+- `cast_len` : The nubmer of members in the cast, in a normelized form (min-max normalization).
+- `cast_genders_ratio` : The gender ratio (`Females / Females + Males`) of cast.
+- `[actor name]` : Dummy column for the 10 most frequent actors in our universe
+- `[department name]` : The nubmer of members in the each department, in a normelized form (min-max normalization).
+- `[director name]` : Dummy column for the 10 most frequent directors in our universe
+- `avg_popularity_by_year` : Mean popularity of films in the released year of a movie.
+
+
