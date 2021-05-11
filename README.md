@@ -65,8 +65,8 @@ train_raw.describe().apply(lambda s: s.apply(lambda x: format(x, 'g')))
 ```python
 test_raw.describe().apply(lambda s: s.apply(lambda x: format(x, 'g')))
 ```
+![jpeg](snippets_for_read_me/train_describe.jpeg)
 
-![jpeg](snippets_for_read_me/print_of_suspected_missing_vals.jpeg)
 
 - We can see that both train & test contain uncertain data - rows with runtime = 0 , budget = 0 
 - We will treat those values as missing data and they will be imputed later on.
@@ -77,15 +77,15 @@ print(f"Train dataset: Amount of movies with 0 runtime: {len(train_raw[train_raw
 print(f"Test dataset : Amount of movies with 0 budget: {len(test_raw[test_raw['budget'] == 0])}")
 print(f"Test dataset : Amount of movies with 0 budget: {len(test_raw[test_raw['runtime'] == 0])}")
 ```
+![jpeg](snippets_for_read_me/print_of_suspected_missing_vals.jpeg)
 
-![jpeg](snippets_for_read_me/train_describe.jpeg)
 
 ### Features distribution & comparative analysis between features
 ``` python
 sns.pairplot(train_raw.select_dtypes('number').drop(columns='id'), kind="reg", diag_kind="kde")
 plt.show()
 ```
-
+![jpeg](snippets_for_read_me/pairplot_for_correlation.jpeg.jpeg)
 
 * In the main diagonal we can see each of the numerical column distribution
 
@@ -103,6 +103,8 @@ sns.heatmap(train_raw[cols].corr(), cmap="Blues")
 plt.show()
 ```
 
+![jpeg](snippets_for_read_me/correlation_matrix.jpeg)
+
 
 ## Missing data
 ```python 
@@ -116,10 +118,16 @@ print ("Train missing values :")
 train_na.isnull().sum().sort_values(ascending=False)
 ```
 
+![jpeg](snippets_for_read_me/train_missing_values.jpeg)
+
 ``` python
 print ("Test missing values :")
 test_na.isnull().sum().sort_values(ascending=False)
 ```
+
+![jpeg](snippets_for_read_me/test_missing_values.jpeg)
+
+
 - The feature <b>'belongs_to_collection'</b> contains many None's. That makes sense because most the movies are not part of a collection 
 - The features <b>'homepage'</b> & <b>'tagline'</b> also has many None values.
 That makes them preaty unrelevant for out task because if imputation is required (not necessarily) we won't be able to apply it without additional data. Also the percentage of None values is ~50% & ~20% accordingly (high numbers)
