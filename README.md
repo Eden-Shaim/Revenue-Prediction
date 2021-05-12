@@ -181,13 +181,13 @@ flatten_test_df = flatten_features(test_raw)
 ```python
 flatten_train_df.head()
 ```
-![jpeg](snippets_for_read_me/flatten_train.jpeg)
+![PNG](snippets_for_read_me/flatten_train.PNG)
 
 ``` python
 flatten_test_df.head()
 ```
 
-![jpeg](snippets_for_read_me/flatten_test.jpeg)
+![PNG](snippets_for_read_me/flatten_test.PNG)
 
 ### Our features candidates (before feature selection):
 
@@ -224,14 +224,14 @@ extracted_train = extract_features(flatten_train_df, set_of_departments, 'train'
 extracted_train.head()
 ```
 
-![jpeg](snippets_for_read_me/extracted_features_train.jpeg)
+![PNG](snippets_for_read_me/extracted_features_train.PNG)
 
 ```python
 extracted_test = extract_features(flatten_test_df, set_of_departments, 'test')
 extracted_test.head()
 ```
 
-![jpeg](snippets_for_read_me/extracted_features_test.jpeg)
+![PNG](snippets_for_read_me/extracted_features_test.PNG)
 
 ### Handling missing data
 
@@ -245,12 +245,12 @@ imputated_test =  imputation(extracted_test)
 ```python
 imputated_train.head()
 ```
-![jpeg](snippets_for_read_me/imputed_train.jpeg)
+![PNG](snippets_for_read_me/imputed_train.PNG)
 
 ```python
 imputated_test.head()
 ```
-![jpeg](snippets_for_read_me/imputed_test.jpeg)
+![PNG](snippets_for_read_me/imputed_test.PNG)
 
 ## Prediction
 
