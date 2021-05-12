@@ -216,4 +216,37 @@ flatten_test_df.head()
 - `[director name]` : Dummy column for the 10 most frequent directors in our universe
 - `avg_popularity_by_year` : Mean popularity of films in the released year of a movie.
 
+* Overall we added 81 dummies
+
+
+```python
+extracted_train = extract_features(flatten_train_df, set_of_departments, 'train')
+extracted_train.head()
+```
+
+```python
+extracted_test = extract_features(flatten_test_df, set_of_departments, 'test')
+extracted_test.head()
+```
+### Handling missing data
+
+We used KNN (`k = 5, Euclidean distance`) Imputation to find budget & runtime for films with zero values.
+
+```python
+imputated_train =  imputation(extracted_train)
+imputated_test =  imputation(extracted_test)
+```
+
+```python
+imputated_train.head()
+```
+
+```python
+imputated_test.head()
+```
+
+## Prediction
+
+
+
 
