@@ -50,6 +50,25 @@ counts_test
 
 ![jpeg](snippets_for_read_me/raw_counts_test.jpeg)
 
+### Check categorical cols (un-nested) distibution: video & status
+
+```python
+train_raw['video'].value_counts().plot(kind='bar')
+plt.title('Video distribution')
+plt.ylabel('Number of records')
+plt.xticks(rotation=360)
+```
+![jpeg](snippets_for_read_me/video_distribution.jpeg)
+
+
+```python
+train_raw['status'].value_counts().plot(kind='bar')
+plt.title('Status distribution')
+plt.ylabel('Number of records')
+plt.xticks(rotation=360)
+```
+![jpeg](snippets_for_read_me/status_distribution.jpeg)
+
 - As we can see the train dataset & test dataset are in the same structure and both contain nested columns 
 - we will unpack the nested structures later on. Those columns are all Strings.
 - There are no duplicate rows in both datasets
