@@ -254,6 +254,61 @@ imputated_test.head()
 
 ## Prediction
 
+## Prediction
+
+We tried multiple models.. We decided to show 3 of the models that got the best scores -  xgboost, lightgbm and RandomForestRegressor
+- For each model, we did the hyperparameter tuning with CV with RandomizedSearchCV module which is implemented as part of sklearn.model_selection. RandomizedSearchCV tune the hyperparameter  by cross-validated search over parameter settings.
+- Due to long runtimes when trying to find the best hyperparameters for each model, we chose a sample of parameters to tune. 
+- After the best parameters were selected , the predictions were applied.
+
+```python
+Y_train = imputated_train['revenue']
+X_train = imputated_train.drop(['revenue'], axis=1)
+Y_test = imputated_test['revenue']
+X_test = imputated_test.drop(['revenue'], axis=1)
+```
+
+ ## Hyperparameter selection
+- We couldn't tune all the params.. so we chose some of the defualt\ known best params for our mission
+
+```python
+def tune_params(model, params,x_train,y_train): 
+    tuned_model = RandomizedSearchCV(estimator=model, param_distributions=params, n_iter = 10,
+                                scoring='neg_mean_squared_log_error', verbose=2, random_state=42,
+                                n_jobs=-1, return_train_score=True)
+
+    tuned_model.fit(x_train, y_train) 
+    print(tuned_model.best_params_)
+    return tuned_model.best_params_
+ ```
+ 
+ ### XGBoost
+
+```python
+xgb_params = {   'subsample': 0.6, 
+                'reg_lambda': 10, 
+                'reg_alpha': 2, 
+                'objective': 'reg:squarederror', 
+                'learning_rate': 0.01, 
+                'gamma': 0.5, 
+                'colsample_bytree': 0.6 }
+
+xgb_model = xgb.XGBRegressor(**xgb_params, n_jobs=-1)
+
+param_search_xgb = {
+    'max_depth':range(5, 7, 9),
+    'min_child_weight':range(2, 4),
+    'n_estimators': range(750, 1000),
+    'reg_alpha': range(2, 4)
+}
+
+param_checked_xgb = tune_params(xgb_model, param_search_xgb, X_train, Y_train )
+xgb_params.update(param_checked_xgb)
+```
+
+### LBG
+
+
 
 
 
