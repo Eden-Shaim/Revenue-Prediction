@@ -9,9 +9,19 @@ from preprocess import *
 pd.set_option('display.max_columns', None)
 from matplotlib.colors import rgb_to_hsv
 import seaborn as sns
+from sklearn.metrics import mean_squared_log_error
 import matplotlib.pyplot as plt
+import time
+import xgboost as xgb
+import lightgbm as lgb
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import RandomizedSearchCV
 %matplotlib inline
 sns.set(font_scale=1.3)
+
+import warnings
+warnings.filterwarnings('ignore')
 ```
 
 ``` python
@@ -173,6 +183,13 @@ In each column you can find the numbers of members in the crew from the fitting 
 - `crew_directors_names` - A column that contains a tuple of each of the director's names
 
 
+```python
+cols_to_drop = ['backdrop_path', 'homepage', 'imdb_id', 'original_title', 'poster_path', 'status', 'video']
+train_raw = drop_column(train_raw, cols_to_drop)
+test_raw = drop_column(test_raw, cols_to_drop)
+```
+We threw all the columns we had not used at all.
+
 ``` python 
 flatten_train_df = flatten_features(train_raw)
 flatten_test_df = flatten_features(test_raw)
@@ -233,6 +250,21 @@ extracted_test.head()
 
 ![PNG](snippets_for_read_me/extracted_features_test.PNG)
 
+## Some more EDA before after flattning the df and extraction of features
+- How many movies do we have in each year, month? 
+
+```python
+plt.figure(figsize=(20, 14))
+plt.subplot(2, 1, 1)
+sns.countplot(extracted_train['release_year'], palette="Set3")
+plt.xticks(rotation=90)
+plt.subplot(2, 1, 2)
+sns.countplot(extracted_train['release_month'],palette="Set3")
+plt.xticks(rotation=90)
+plt.show()
+```
+
+
 ### Handling missing data
 
 We used KNN (`k = 5, Euclidean distance`) Imputation to find budget & runtime for films with zero values.
@@ -254,12 +286,30 @@ imputated_test.head()
 
 ## Prediction
 
-## Prediction
-
 We tried multiple models.. We decided to show 3 of the models that got the best scores -  xgboost, lightgbm and RandomForestRegressor
-- For each model, we did the hyperparameter tuning with CV with RandomizedSearchCV module which is implemented as part of sklearn.model_selection. RandomizedSearchCV tune the hyperparameter  by cross-validated search over parameter settings.
-- Due to long runtimes when trying to find the best hyperparameters for each model, we chose a sample of parameters to tune. 
-- After the best parameters were selected , the predictions were applied.
+- For each model, we did the hyperparameter tuning & CV with RandomizedSearchCV module which is implemented as part of sklearn.model_selection. RandomizedSearchCV tune the hyperparameter by cross-validated (5 folds) search over parameter settings. It chooses n_candidates (10) from the given ranges.
+- Due to long runtimes when trying to find the best hyperparameters for each model, we chose a sample of parameters to tune:
+
+- <b> XGBoost </b> :
+- `max_depth` :range(5, 7),
+- `min_child_weight`:range(2, 4),
+- `n_estimators`: range(750, 1000),                       
+- `reg_alpha`: range(2, 4)
+
+- <b> LGBMRegressor </b> :
+- `max_depth` :range(-1, 5),          
+- `min_child_weight`:range(0, 1),      
+- `n_estimators`: range(100, 500),
+
+- <b> RandomForest </b> :
+- `n_estimators` : range(1000,1500)                        
+- `max_depth` : range(10,50)
+
+
+- The chosen parametes for each model will be presented below.
+- The validation is performed with the hyper parameter tuning.
+- The models performance were measured by the RMSLE measurment. We will present the best results that each model was able to achieve according to the measurment & hyperparameters
+- For our chosen model (XGBRegressor) we plot a feature importance graph 
 
 ```python
 Y_train = imputated_train['revenue']
@@ -272,7 +322,7 @@ X_test = imputated_test.drop(['revenue'], axis=1)
 - We couldn't tune all the params.. so we chose some of the defualt\ known best params for our mission
 
 ```python
-def tune_params(model, params,x_train,y_train): 
+ddef tune_params(model, params,x_train,y_train): 
     tuned_model = RandomizedSearchCV(estimator=model, param_distributions=params, n_iter = 10,
                                 scoring='neg_mean_squared_log_error', verbose=2, random_state=42,
                                 n_jobs=-1, return_train_score=True)
@@ -280,35 +330,130 @@ def tune_params(model, params,x_train,y_train):
     tuned_model.fit(x_train, y_train) 
     print(tuned_model.best_params_)
     return tuned_model.best_params_
+
+def train_model(train, label, model, model_name):
+    model.fit(train, np.log1p(label))
+    with open(f'models/{model_name}.pkl', 'wb') as f:
+        pickle.dump(model, f)
+    predictions = np.expm1(model.predict(train))
+    RMSLE = np.sqrt(mean_squared_log_error(label, predictions))
+    print(f"RMSLE for train dataset for {model_name} model is: {round(RMSLE, 4)}")
+    return model
+
+def evaluate_model(test, label, trained_model, model_name):
+    if model_name == 'xgb':
+        xgb.plot_importance(trained_model, max_num_features=10)
+        plt.rcParams["figure.figsize"] = (25, 8)
+        plt.show()
+    predictions = np.expm1(trained_model.predict(test))
+    RMSLE = np.sqrt(mean_squared_log_error(label, predictions))
+    print(f"RMSLE for test dataset for {model_name} model is: {round(RMSLE, 4)}")
+    return predictions
  ```
- 
- ### XGBoost
+
+### LBG
+
+```python
+lgb_params = {'boosting_type': 'gbdt',
+                'class_weight': None,
+                'colsample_bytree': 1.0,
+                'importance_type': 'split',
+                'learning_rate': 0.1,
+                'min_child_samples': 20,
+                'min_split_gain': 0.0,
+                'n_jobs': -1,
+                'num_leaves': 31,
+                'objective': 'regression',
+                'random_state': None,
+                'reg_alpha': 0.0,
+                'reg_lambda': 0.0,
+                'silent': True,
+                'subsample': 1.0,
+                'subsample_for_bin': 200000,
+                'subsample_freq': 0,
+                'max_depth':-1,
+                'min_child_weight': 0.04,
+                'n_estimators': 100}
+
+X = X_train.rename(columns=lambda x: re.sub('[^A-Za-z0-9_]+', '', x))
+lgb_model = lgb.LGBMRegressor(**lgb_params)
+# create tuned model
+lgb_model = lgb.LGBMRegressor(**lgb_params)
+# train model
+lgb_model = train_model(X, Y_train, lgb_model, 'lgb')
+# evaluate
+X_test_lgb = X_test.rename(columns=lambda x: re.sub('[^A-Za-z0-9_]+', '', x))
+lgb_predictions = evaluate_model(X_test_lgb, Y_test, lgb_model, 'lgb')
+```
+
+### Random Forest
+```python
+from sklearn.ensemble import RandomForestRegressor
+rf_params = {   'n_estimators': 1500,
+                'min_samples_split': 2,
+                'min_samples_leaf': 2,
+                'max_features': 0.4,
+                'max_depth': 50,
+                'criterion': 'mae',
+                'bootstrap': False  }
+
+rf_model = RandomForestRegressor(**rf_params, n_jobs= -1)
+# create tuned model
+rf_model = RandomForestRegressor(**rf_params, n_jobs= -1)
+# train model
+rf_model = train_model(X_train, Y_train, rf_model, 'rf')
+# evaluate
+rf_predictions = evaluate_model(X_test, Y_test, rf_model, 'rf')
+```
+
+### XGBoost
 
 ```python
 xgb_params = {   'subsample': 0.6, 
                 'reg_lambda': 10, 
                 'reg_alpha': 2, 
                 'objective': 'reg:squarederror', 
+                'n_estimators': 1000, 
+                'min_child_weight': 4, 
+                'max_depth': 7, 
                 'learning_rate': 0.01, 
                 'gamma': 0.5, 
                 'colsample_bytree': 0.6 }
 
+# create tuned model
 xgb_model = xgb.XGBRegressor(**xgb_params, n_jobs=-1)
-
-param_search_xgb = {
-    'max_depth':range(5, 7, 9),
-    'min_child_weight':range(2, 4),
-    'n_estimators': range(750, 1000),
-    'reg_alpha': range(2, 4)
-}
-
-param_checked_xgb = tune_params(xgb_model, param_search_xgb, X_train, Y_train )
-xgb_params.update(param_checked_xgb)
+# train model
+xgb_model = train_model(X_train, Y_train, xgb_model, 'xgb')
+# evaluate
+xgb_predictions = evaluate_model(X_test, Y_test, xgb_model, 'xgb')
 ```
 
-### LBG
+### Let's plot the predictions to see the best fit
 
+```python
+df_revenue_time_series = pd.DataFrame()
+df_revenue_time_series['true_label'] = list(Y_test)
+df_revenue_time_series['release_year'] = list(X_test['release_year'])
+df_revenue_time_series['xgb_pred'] = list(xgb_predictions)
+df_revenue_time_series['lgb_pred'] = list(lgb_predictions)
+df_revenue_time_series['rf_pred'] = list(rf_predictions)
+```
 
+```python
+ax = plt.gca()
+df_plot_results = df_revenue_time_series[['release_year','true_label','xgb_pred','lgb_pred','rf_pred']].groupby('release_year').mean()
+df_plot_results['year'] = df_plot_results.index
+plt.rcParams['figure.figsize'] = [20, 10]
+plt.title('Predictions comparison over the years')
+df_plot_results.plot(kind='line',x= 'year' ,y ='true_label', ax = ax)
+df_plot_results.plot(kind='line',x= 'year' ,y ='xgb_pred',ax = ax)
+df_plot_results.plot(kind='line',x= 'year' ,y ='lgb_pred',ax = ax)
+df_plot_results.plot(kind='line',x= 'year' ,y ='rf_pred',ax = ax)
 
+```
 
+### Conclusions
+- As you can see, the evaluation results for the 3 models were pretty similar.
+- We chose our final model to be XGBRegressor because it got the lowest RMSLE
+- From the feature importance graph we can learn wich features affects most on the model
 
