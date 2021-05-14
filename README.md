@@ -263,7 +263,9 @@ sns.countplot(extracted_train['release_month'],palette="Set3")
 plt.xticks(rotation=90)
 plt.show()
 ```
+![PNG](snippets_for_read_me/movies_per_year.PNG)
 
+![PNG](snippets_for_read_me/movies_per_month.PNG)
 
 ### Handling missing data
 
@@ -385,6 +387,7 @@ lgb_model = train_model(X, Y_train, lgb_model, 'lgb')
 X_test_lgb = X_test.rename(columns=lambda x: re.sub('[^A-Za-z0-9_]+', '', x))
 lgb_predictions = evaluate_model(X_test_lgb, Y_test, lgb_model, 'lgb')
 ```
+![PNG](snippets_for_read_me/lgb.PNG)
 
 ### Random Forest
 ```python
@@ -405,6 +408,7 @@ rf_model = train_model(X_train, Y_train, rf_model, 'rf')
 # evaluate
 rf_predictions = evaluate_model(X_test, Y_test, rf_model, 'rf')
 ```
+![PNG](snippets_for_read_me/rf.PNG)
 
 ### XGBoost
 
@@ -427,6 +431,7 @@ xgb_model = train_model(X_train, Y_train, xgb_model, 'xgb')
 # evaluate
 xgb_predictions = evaluate_model(X_test, Y_test, xgb_model, 'xgb')
 ```
+![PNG](snippets_for_read_me/xgb.PNG)
 
 ### Let's plot the predictions to see the best fit
 
@@ -451,6 +456,7 @@ df_plot_results.plot(kind='line',x= 'year' ,y ='lgb_pred',ax = ax)
 df_plot_results.plot(kind='line',x= 'year' ,y ='rf_pred',ax = ax)
 
 ```
+![PNG](snippets_for_read_me/plot_predictions.PNG)
 
 ### Conclusions
 - As you can see, the evaluation results for the 3 models were pretty similar.
